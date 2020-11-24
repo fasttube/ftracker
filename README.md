@@ -1,19 +1,19 @@
 # FT Corona Tracker
 
-- Pro Raum:
-    - 1 QR-Code für ankommen
-        - Vorname + Nachname + "OK"
-        - Prüfen ob Person Passierschein hat
-    - 1 QR-Code für gehen
-        - Vorname + Nachname + "Arbeitsplatz gereinigt" + "OK"
-        - Wenn nicht angemeldet: Wann bist du gekommen?
-- Corona-Richtlinien verlinkt
-- LocalStorage des Namen
-- robots.txt no google
-- Datenaufbereitung
-    - Einfache Tabelle oder so
-- DATENSCHUTZ
-    - Team Captain, Technische Leiter, Admins
-    - Minimale Daten: Nur das eigegebene
+- Per Room:
+    - 1 QR-Code for arrival
+        - First + last name + "OK"
+        - Tick "I will adhere to the [corona guidelines]"
+        - Check if person is on preapproved list
+    - 1 QR-Code for leaving
+        - First + last name + "I cleaned my workspace" + "OK"
+        - If not signed in on arrival: When did you arrive?
+- LocalStorage to save name
+- robots.txt: no google indexing
+- Data visualization
+    - Table-like
+- Data protection
+    - Password protected data access
+    - Minimal data: Only entered data
 
-Bonus: Reminder wenn nicht abgemeldet?
+Bonus: Send reminder if forgot to sign out?

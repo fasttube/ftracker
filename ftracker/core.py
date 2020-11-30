@@ -9,7 +9,8 @@ if not config:
 
 
 from tinydb import TinyDB
-db = TinyDB(config.get('global','db_file', fallback='/tmp/ftracker-db.json'), indent=4)
+dbfile = config['global'].get('db_file') or '/tmp/ftracker-db.json'
+db = TinyDB(dbfile, indent=4)
 # TODO: Load name list if needed
 
 

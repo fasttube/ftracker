@@ -31,8 +31,14 @@ def post_time():
 	except ValueError as e:
 		return 'Error: JSON decode error:\n' + str(e), 400
 
-	# TODO: JSON schema validation
-	# TODO: JSON content validation
+	if not ('name' in data and 'agreetoguidelines' in data):
+		return "Error: Key missing. See docs/API.md for reference.", 400
+
+	if not data['agreetoguidelines']:
+		return "Error: Didn't agree to guidelines.", 406
+
+
+
 	name = slugify(data['name'])
 
 	now = datetime.utcnow()

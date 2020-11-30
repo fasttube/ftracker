@@ -2,16 +2,18 @@ import json
 from datetime import datetime
 from slugify import slugify
 
-from .config import config
-if not config:
-	print('No configuration file found.')
-	exit()
+from .config import Config
+config = Config()
 
 
 from tinydb import TinyDB
-dbfile = config['global'].get('db_file') or '/tmp/ftracker-db.json'
+dbfile = config['db_file'] or '/tmp/ftracker-db.json'
 db = TinyDB(dbfile, indent=4)
-# TODO: Load name list if needed
+
+
+from .namelist import NameList
+namefile = config['name_file'] or None
+namelist = NameList(namefile)
 
 
 from flask import Flask, request
@@ -37,9 +39,10 @@ def post_time():
 	if not data['agreetoguidelines']:
 		return "Error: Didn't agree to guidelines.", 406
 
-
-
 	name = slugify(data['name'])
+
+	if not name in namelist:
+		return "Error: Name not in permitted list.", 401
 
 	now = datetime.utcnow()
 	db.insert({

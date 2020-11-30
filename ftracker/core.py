@@ -4,11 +4,12 @@ from slugify import slugify
 
 from .config import Config
 config = Config()
+SPACES = int(config['json_indent']) if config['json_indent'] else None
 
 
 from tinydb import TinyDB, Query, operations
 dbfile = config['db_file'] or '/tmp/ftracker-db.json'
-db = TinyDB(dbfile, indent=4)
+db = TinyDB(dbfile, indent=SPACES)
 
 
 from .namelist import NameList
@@ -46,10 +47,15 @@ def post_arrival():
 		return "Error: Name not in permitted list.", 401
 
 	Entry = Query()
-	if db.contains((Entry.name == name) & (Entry.departure == None)):
+	openarrival = db.get((Entry.name == name) & (Entry.departure == None))
+	if openarrival:
 		# Did not depart last time
 		# TODO: Return structured request to resend departure
-		return "Error: Undeparted arrival exists", 406
+		return json.dumps({
+			'request': 'departure',
+			'arrival': openarrival['arrival'],
+			'message': "Error: Undeparted arrival exists"
+		}, indent=SPACES), 409
 
 	now = datetime.utcnow()
 	db.insert({
@@ -85,7 +91,10 @@ def post_departure():
 	if not db.contains((Entry.name == name) & (Entry.departure == None)):
 		# Did not arrive before
 		# TODO: Return structured request to resend arrival
-		return "Error: No arrival exists", 406
+		return json.dumps({
+			'request': 'arrival',
+			'message': "Error: No arrival exists"
+		}, indent=SPACES), 409
 
 	now = datetime.utcnow()
 	db.update(
@@ -108,4 +117,4 @@ def get_data():
 	if request.authorization.password != config['admin_pass']:
 		return "Wrong password", 403
 
-	return json.dumps(db.all(), indent=4), 200
+	return json.dumps(db.all(), indent=SPACES), 200

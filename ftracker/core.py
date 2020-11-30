@@ -94,3 +94,18 @@ def post_departure():
 	)
 
 	return 'OK', 200
+
+
+@app.route('/data')
+def get_data():
+
+	if not 'Authorization' in request.headers:
+		return 'Error: No Authorization', 401, {'WWW-Authenticate': 'Basic'}
+
+	if request.authorization.username != config['admin_user']:
+		return "Wrong username", 403
+
+	if request.authorization.password != config['admin_pass']:
+		return "Wrong password", 403
+
+	return json.dumps(db.all(), indent=4), 200

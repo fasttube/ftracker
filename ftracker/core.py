@@ -6,7 +6,7 @@ from .config import Config
 config = Config()
 
 
-from tinydb import TinyDB
+from tinydb import TinyDB, Query, operations
 dbfile = config['db_file'] or '/tmp/ftracker-db.json'
 db = TinyDB(dbfile, indent=4)
 
@@ -24,8 +24,9 @@ app = Flask(__name__)
 def get_root():
 	return "Error: No Endpoint selected. See docs/API.md for reference.", 404
 
+
 @app.route('/arrival', methods=['POST'])
-def post_time():
+def post_arrival():
 
 	try:
 		payload = request.data.decode('UTF-8')
@@ -44,11 +45,52 @@ def post_time():
 	if not name in namelist:
 		return "Error: Name not in permitted list.", 401
 
+	Entry = Query()
+	if db.contains((Entry.name == name) & (Entry.departure == None)):
+		# Did not depart last time
+		# TODO: Return structured request to resend departure
+		return "Error: Undeparted arrival exists", 406
+
 	now = datetime.utcnow()
 	db.insert({
 		'name': name,
 		'arrival': now.isoformat(),
 		'departure': None
 	})
+
+	return 'OK', 200
+
+
+@app.route('/departure', methods=['POST'])
+def post_departure():
+
+	try:
+		payload = request.data.decode('UTF-8')
+		data = json.loads(payload)
+	except ValueError as e:
+		return 'Error: JSON decode error:\n' + str(e), 400
+
+	if not ('name' in data and 'cleanedworkspace' in data):
+		return "Error: Key missing. See docs/API.md for reference.", 400
+
+	if not data['cleanedworkspace']:
+		return "Error: Didn't clean workspace.", 406
+
+	name = slugify(data['name'])
+
+	if not name in namelist:
+		return "Error: Name not in permitted list.", 401
+
+	Entry = Query()
+	if not db.contains((Entry.name == name) & (Entry.departure == None)):
+		# Did not arrive before
+		# TODO: Return structured request to resend arrival
+		return "Error: No arrival exists", 406
+
+	now = datetime.utcnow()
+	db.update(
+		operations.set('departure', now.isoformat()),
+		(Entry.name == name) & (Entry.departure == None)
+	)
 
 	return 'OK', 200

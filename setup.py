@@ -19,6 +19,7 @@ st.setup(
 	install_requires=[
 		"flask",
 		"tinydb",
+		"python-slugify",
 	],
 	license=license_text,
 	classifiers=[

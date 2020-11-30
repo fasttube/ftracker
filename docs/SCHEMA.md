@@ -1,5 +1,5 @@
-Database Layout
-===============
+Database Layout Documentation
+=============================
 
 Default table
 ```
@@ -8,6 +8,7 @@ Default table
 		'name': 'firstname-middlename-lastname',
 		'arrival': 'UTC-ISO-TIMESTAMP',
 		'departure': 'UTC-ISO-TIMESTAMP'
-	}
+	},
+	...
 ]
 ```

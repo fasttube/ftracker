@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from slugify import slugify
 
 from .config import config
 if not config:
@@ -31,10 +32,11 @@ def post_time():
 
 	# TODO: JSON schema validation
 	# TODO: JSON content validation
+	name = slugify(data['name'])
 
 	now = datetime.utcnow()
 	db.insert({
-		'name': data['name'],
+		'name': name,
 		'arrival': now.isoformat(),
 		'departure': None
 	})

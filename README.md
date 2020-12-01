@@ -16,7 +16,7 @@ pip3 install -e .
 python3 -m ftracker
 ```
 
-Then, query the endpoint at <http://localhost:5000/times>.
+Then, point your browser at <http://localhost:5000/?arrival=42>.
 
 ## License
 

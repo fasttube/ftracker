@@ -7,6 +7,7 @@ Arrival
 POST /arrival
 
 {
+	"room": "roomname",
 	"name": "Firstname Lastname",
 	"agreetoguidelines": true
 }
@@ -42,9 +43,10 @@ Authorization: Basic < base64 USER:PASSWORD >
 
 [
 	{
-		'name': 'firstname-middlename-lastname',
-		'arrival': 'UTC-ISO-TIMESTAMP',
-		'departure': 'UTC-ISO-TIMESTAMP'
+		"room": "roomname",
+		"name": "firstname-middlename-lastname",
+		"arrival": "UTC-ISO-TIMESTAMP",
+		"departure": "UTC-ISO-TIMESTAMP" || null
 	},
 	...
 ]

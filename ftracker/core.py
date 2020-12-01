@@ -35,7 +35,7 @@ def post_arrival():
 	except ValueError as e:
 		return 'Error: JSON decode error:\n' + str(e), 400
 
-	if not ('name' in data and 'agreetoguidelines' in data):
+	if not ('room' in data and 'name' in data and 'agreetoguidelines' in data):
 		return "Error: Key missing. See docs/API.md for reference.", 400
 
 	if not data['agreetoguidelines']:
@@ -50,16 +50,19 @@ def post_arrival():
 	openarrival = db.get((Entry.name == name) & (Entry.departure == None))
 	if openarrival:
 		# Did not depart last time
-		# TODO: Return structured request to resend departure
 		return json.dumps({
 			'request': 'departure',
-			'arrival': openarrival['arrival'],
+			'arrival': {
+				'time': openarrival['arrival'],
+				'room': openarrival['room']
+			},
 			'message': "Error: Undeparted arrival exists"
 		}, indent=SPACES), 409
 
 	now = datetime.utcnow()
 	db.insert({
 		'name': name,
+		'room': data['room'],
 		'arrival': now.isoformat(),
 		'departure': None
 	})
@@ -88,9 +91,9 @@ def post_departure():
 		return "Error: Name not in permitted list.", 401
 
 	Entry = Query()
-	if not db.contains((Entry.name == name) & (Entry.departure == None)):
+	openarrival = db.get((Entry.name == name) & (Entry.departure == None))
+	if not openarrival:
 		# Did not arrive before
-		# TODO: Return structured request to resend arrival
 		return json.dumps({
 			'request': 'arrival',
 			'message': "Error: No arrival exists"
@@ -119,6 +122,7 @@ def get_data():
 
 	start = request.args.get('start', default = None, type = str)
 	end   = request.args.get('end'  , default = None, type = str)
+	room  = request.args.get('room' , default = ".*", type = str)
 
 	def is_after(val, iso):
 		return (val >= iso if val else True ) if iso else True
@@ -129,7 +133,8 @@ def get_data():
 	Entry = Query()
 	r = db.search(
 		(Entry.departure.test(is_after, start)) &
-		(Entry.arrival.test(is_before, end))
+		(Entry.arrival.test(is_before, end)) &
+		(Entry.room.search(room))
 	)
 
 	return json.dumps(r, indent=SPACES), 200

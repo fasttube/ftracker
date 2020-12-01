@@ -2,6 +2,67 @@
 <html>
 	<head>
 		<title>FTracker</title>
+		<meta name="theme-color" content="#c50e1f">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<style>
+			html, body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				background: #ddd;
+				font-family: sans-serif;
+			}
+			h1 {
+				margin: 0;
+				padding: 16px;
+				text-transform: uppercase;
+				color: #eee;
+				background: #c50e1f;
+				text-align: center;
+			}
+			form {
+				padding: 16px;
+			}
+			label {
+				display: block;
+				font-size: 16px;
+				margin-bottom: 16px;
+				color: #444;
+			}
+			label#agreelabel {
+				height: 32px;
+				line-height: 32px;
+			}
+			label span {
+				width: calc(100% - 50px);
+				display: inline-block;
+				vertical-align: middle;
+				line-height: normal;
+			}
+			input {
+				border: none;
+				padding: 16px;
+				font-size: 16px;
+			}
+			input[type=text] {
+				color: #000;
+				width: calc(100% - 32px);
+			}
+			input[type=submit] {
+				background: #c50e1f;
+				text-transform: uppercase;
+				font-weight: bold;
+				color: #fff;
+				width: 100%;
+			}
+			input[type=checkbox] {
+				transform: translateY(-3px);
+				float: left;
+				height: 32px;
+				width: 32px;
+				margin-right: 8px;
+			}
+		</style>
 		<script>
 			var cbt = {
 				'arrival': 'I have read and will adhere to the <a href="/guidelines" target="_blank">protection guidelines</a>',
@@ -28,22 +89,20 @@
 		</script>
 	</head>
 	<body>
-		<main>
-			<h1><script>
-				document.write(qp.action + " " + qp.room)
-			</script></h1>
-			<form>
-				<label>
-					Full Name:<br>
-					<input type="text" name="name" id="name" required>
-				</label><br>
-				<label>
-					<input type="checkbox" name="agree" id="agree" required>
-					<script>document.write(cbt[qp.action])</script>
-				</label><br>
-				<input type="submit">
-			</form>
-		</main>
+		<h1><script>
+			document.write(qp.action + "<br>Room " + qp.room)
+		</script></h1>
+		<form>
+			<label>
+				Full Name:<br>
+				<input type="text" name="name" id="name" placeholder="John Doe" required>
+			</label>
+			<label id="agreelabel">
+				<input type="checkbox" name="agree" id="agree" required>
+				<span><script>document.write(cbt[qp.action])</script></span>
+			</label>
+			<input type="submit">
+		</form>
 		<script>
 			// Prefill the name field if it was successfully entered before
 			var savedName = localStorage.getItem('name')

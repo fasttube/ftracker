@@ -117,4 +117,19 @@ def get_data():
 	if request.authorization.password != config['admin_pass']:
 		return "Wrong password", 403
 
-	return json.dumps(db.all(), indent=SPACES), 200
+	start = request.args.get('start', default = None, type = str)
+	end   = request.args.get('end'  , default = None, type = str)
+
+	def is_after(val, iso):
+		return (val >= iso if val else True ) if iso else True
+
+	def is_before(val, iso):
+		return (val <= iso if val else False) if iso else True
+
+	Entry = Query()
+	r = db.search(
+		(Entry.departure.test(is_after, start)) &
+		(Entry.arrival.test(is_before, end))
+	)
+
+	return json.dumps(r, indent=SPACES), 200

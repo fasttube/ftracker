@@ -64,6 +64,7 @@
 			}
 		</style>
 		<script>
+			// 1st script, prepares values needed for writing document
 			var cbt = {
 				'arrival': 'I have read and will adhere to the <a href="/guidelines" target="_blank">protection guidelines</a>',
 				'departure': 'I have cleaned my workspace'
@@ -109,6 +110,7 @@
 			if (savedName)
 				document.getElementById('name').value = savedName
 
+			// 2nd script, server API communication
 			form = document.querySelector('form')
 			form.onsubmit= function(e) {
 				e.preventDefault()
@@ -117,6 +119,7 @@
 				var name = e.srcElement[0].value
 				var agreed = e.srcElement[1].checked
 
+				// POST JSON. See docs/API.md
 				var payload = (qp.action == 'arrival') ?
 					{
 						'room': qp.room,
@@ -134,9 +137,12 @@
 					method: "POST",
 					body: JSON.stringify(payload)
 				}).then(res => {
+
 					console.log("Request complete! response:", res)
+
 					if (Math.floor(res.status / 100) == 2) {
 
+						// Success
 						form.innerHTML = "<h2>Done. Thanks!</h2>"
 						localStorage.setItem('name', name)
 
@@ -144,7 +150,8 @@
 
 						// Conflict, more data requested
 						res.json().then(function (json) {
-							// TODO: Ask
+
+							// TODO: Ask user for data and resend both
 							alert(json.message)
 						})
 

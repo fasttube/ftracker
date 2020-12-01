@@ -17,8 +17,16 @@ namefile = config['name_file'] or None
 namelist = NameList(namefile)
 
 
-from flask import Flask, request
+from flask import Flask, request, redirect
 app = Flask(__name__, static_folder='../web')
+
+
+@app.route('/guidelines')
+def get_guidelines():
+	dest = config['guideline_url'] or None
+	if dest:
+		return redirect(dest)
+	return "No guideline document was configured.", 404
 
 
 @app.route('/arrival', methods=['POST'])

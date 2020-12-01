@@ -32,7 +32,7 @@
 			<h1><script>
 				document.write(qp.action + " " + qp.room)
 			</script></h1>
-			<form action="#">
+			<form>
 				<label>
 					Full Name:<br>
 					<input type="text" name="name" id="name" required>
@@ -45,21 +45,31 @@
 			</form>
 		</main>
 		<script>
+			// Prefill the name field if it was successfully entered before
+			var savedName = localStorage.getItem('name')
+			if (savedName)
+				document.getElementById('name').value = savedName
+
 			form = document.querySelector('form')
 			form.onsubmit= function(e) {
 				e.preventDefault()
 				console.log(e)
 
+				var name = e.srcElement[0].value
+				var agreed = e.srcElement[1].checked
+
 				var payload = (qp.action == 'arrival') ?
 					{
 						'room': qp.room,
-						'name': e.srcElement[0].value,
-						'agreetoguidelines': e.srcElement[1].checked
+						'name': name,
+						'agreetoguidelines': agreed
 					} :
 					{
-						'name': e.srcElement[0].value,
-						'cleanedworkspace': e.srcElement[1].checked
+						'name': name,
+						'cleanedworkspace': agreed
 					}
+
+				console.log(payload)
 
 				fetch("/" + qp.action, {
 					method: "POST",
@@ -69,6 +79,7 @@
 					if (Math.floor(res.status / 100) == 2) {
 
 						form.innerHTML = "<h2>Done. Thanks!</h2>"
+						localStorage.setItem('name', name)
 
 					} else if (res.status == 409) {
 
@@ -87,8 +98,6 @@
 
 					}
 				})
-
-				console.log(payload)
 			}
 		</script>
 	</body>

@@ -14,6 +14,16 @@ POST /arrival
 
 [Response]
 200 OK
+
+409 CONFLICT
+{
+	"request": "departure",
+	"arrival": {
+		"time": "UTC-ISO-TIMESTAMP",
+		"room": "roomname"
+	},
+	"message": "Error: Undeparted arrival exists"
+}
 ```
 
 
@@ -29,6 +39,12 @@ POST /departure
 
 [Response]
 200 OK
+
+409 CONFLICT
+{
+	"request": "arrival",
+	"message": "Error: No arrival exists"
+}
 ```
 
 

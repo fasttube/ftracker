@@ -18,12 +18,7 @@ namelist = NameList(namefile)
 
 
 from flask import Flask, request
-app = Flask(__name__)
-
-
-@app.route('/')
-def get_root():
-	return "Error: No Endpoint selected. See docs/API.md for reference.", 404
+app = Flask(__name__, static_folder='../web')
 
 
 @app.route('/arrival', methods=['POST'])

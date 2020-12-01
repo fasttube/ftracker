@@ -3,6 +3,14 @@ from .core import *
 # Start the flask server if run from terminal
 if __name__ == "__main__":
 
+	@app.route('/')
+	def get_root():
+		return app.send_static_file('index.html')
+
+	@app.route('/<path:path>')
+	def get_file(path):
+		return app.send_static_file(path)
+
 	# Just allow everything to avoid the hassle when running locally.
 	@app.after_request
 	def add_headers(response):

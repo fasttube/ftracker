@@ -28,7 +28,7 @@ POST /departure
 }
 
 [Response]
-OK
+200 OK
 ```
 
 

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FTracker</title>
+		<script>
+			var cbt = {
+				'arrival': 'I have read the protection <a href="/guidelines">guidelines</a>',
+				'departure': 'I have cleaned my workspace'
+			}
+			function getParams() {
+				var h = document.location.href
+				var qparam = h.split('?')[1] || null
+				if (qparam == null) {
+					alert("Query parameter(s) missing")
+					return null
+				}
+				var vals = qparam.split('=')
+				if (vals.length < 2 || !cbt.hasOwnProperty(vals[0])) {
+					alert("Invalid query parameter")
+					return null
+				}
+				return {
+					action: vals[0],
+					room: vals[1]
+				}
+			}
+			var qp = getParams()
+		</script>
+	</head>
+	<body>
+		<main>
+			<h1><script>
+				document.write(qp.action + " " + qp.room)
+			</script></h1>
+			<form action="#">
+				<label>
+					Full Name:<br>
+					<input type="text" name="name" id="name" required>
+				</label><br>
+				<label>
+					<input type="checkbox" name="agree" id="agree" required>
+					<script>document.write(cbt[qp.action])</script>
+				</label><br>
+				<input type="submit">
+			</form>
+		</main>
+		<script>
+			form = document.querySelector('form')
+			form.onsubmit= function(e) {
+				e.preventDefault()
+				console.log(e)
+
+				var payload = (qp.action == 'arrival') ?
+					{
+						'room': qp.room,
+						'name': e.srcElement[0].value,
+						'agreetoguidelines': e.srcElement[1].checked
+					} :
+					{
+						'name': e.srcElement[0].value,
+						'cleanedworkspace': e.srcElement[1].checked
+					}
+
+				fetch("/" + qp.action, {
+					method: "POST",
+					body: JSON.stringify(payload)
+				}).then(res => {
+					console.log("Request complete! response:", res)
+					if (Math.floor(res.status / 100) == 2) {
+
+						form.innerHTML = "<h2>Done. Thanks!</h2>"
+
+					} else if (res.status == 409) {
+
+						// Conflict, more data requested
+						res.json().then(function (json) {
+							// TODO: Ask
+							alert(json.message)
+						})
+
+					} else {
+
+						// Any other generic error
+						res.text().then(function (text) {
+							alert(text)
+						})
+
+					}
+				})
+
+				console.log(payload)
+			}
+		</script>
+	</body>
+</html>

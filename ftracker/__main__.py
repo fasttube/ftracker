@@ -19,4 +19,4 @@ if __name__ == "__main__":
 		response.headers['Access-Control-Allow-Headers'] = '*'
 		return response
 
-	app.run()
+	app.run(host='0.0.0.0')

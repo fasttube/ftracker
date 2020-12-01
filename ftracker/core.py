@@ -66,7 +66,7 @@ def post_arrival():
 	db.insert({
 		'name': name,
 		'room': data['room'],
-		'arrival': now.isoformat(),
+		'arrival': data.get('arrival') or now.isoformat(),
 		'departure': None
 	})
 
@@ -104,7 +104,7 @@ def post_departure():
 
 	now = datetime.utcnow()
 	db.update(
-		operations.set('departure', now.isoformat()),
+		operations.set('departure', data.get('departure') or now.isoformat()),
 		(Entry.name == name) & (Entry.departure == None)
 	)
 

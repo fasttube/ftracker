@@ -16,55 +16,67 @@
 			}
 			main {
 				height: calc(100% - 42px);
-				overflow-Y: scroll;
 				vertical-align: top;
 			}
 			main > section {
-				height: 100%;
+				height: calc(100% - 32px);
 				display: inline-block;
 				vertical-align: top;
 			}
-			main > section.names {
-				width: 127px;
-				border-right: 1px solid gray;
-			}
-			main > section.timewrap {
-				width: calc(100% - 128px);
-				overflow-X: scroll;
-			}
-			.times {
-				overflow-X: hidden;
-			}
-			.row {
-				position: relative;
-				height: 2em;
-				background-size: 60px 100%;
-			}
-			.names .row:nth-child(odd)  { background: #ddd; }
-			.names .row:nth-child(even) { background: #eee; }
-			.times .row:nth-child(odd)  {
-				background-image: linear-gradient(to right, #bbb 1px, #ddd 1px);
-			}
-			.times .row:nth-child(even) {
-				background-image: linear-gradient(to right, #bbb 1px, #eee 1px);
-			}
-			.row > span {
-				padding: 7px;
+			main > .viewheader {
 				display: inline-block;
+				vertical-align: top;
 			}
-			.names {
+			main > section.names, #nameheader {
+				width: 127px;
+				overflow: hidden;
+				border-right: 1px solid gray;
 				font-weight: bold;
 				text-transform: capitalize;
 			}
-			.times span {
+			main #names {
+				padding-bottom: 32px;
+			}
+			main > section.times, #timeheader {
+				width: calc(100% - 128px);
+				overflow: hidden;
+			}
+			.scroll {
+				height: 100%;
+				width: 100%;
+				overflow: scroll;
+			}
+			.row, .row #timelabels {
+				position: relative;
+				height: 32px;
+				background-size: 60px 100%;
+			}
+			.names .row:nth-child(even) { background: #ddd; }
+			.names .row:nth-child(odd)  { background: #eee; }
+			.times .row:nth-child(even) {
+				background-image: linear-gradient(to right, #bbb 1px, #ddd 1px);
+			}
+			.times .row:nth-child(odd)  {
+				background-image: linear-gradient(to right, #bbb 1px, #eee 1px);
+			}
+			.row span {
+				padding: 7px;
+				display: inline-block;
+			}
+			.times span, #timeheader span {
 				position: absolute;
 				background: #c50e1f;
 				color: #ddd;
 				margin-right: 16px;
 			}
-			#timeheader span {
-				background: none;
-				color: #444;
+			.viewheader.row {
+				height: 31px;
+				background: #ddd !important;
+				border-bottom: 1px solid gray;
+			}
+			.viewheader span {
+				background: none !important;
+				color: #444 !important;
 				padding-left: 4px;
 			}
 		</style>
@@ -76,10 +88,27 @@
 			Raum: <input type="text" id="room" placeholder=".* (regex)" onchange="renderData()">
 		</header>
 		<main>
-			<section class="names"></section><section class="timewrap"><div class="times"></div></section>
+			<div class="row viewheader" id="nameheader">
+				<span><b>Names</b></span>
+			</div><!--
+		 --><div class="row viewheader" id="timeheader">
+				<div id="timelabels"></div>
+			</div>
+			<section class="names">
+				<div id="names"></div>
+			</section><!--
+		 --><section class="times">
+				<div class="scroll">
+					<div id="times"></div>
+				</div>
+			</section>
 		</main>
 		<script>
 			var data = null;
+
+			var names = document.querySelector('main #names')
+			var times = document.querySelector('main #times')
+
 			function renderData() {
 
 				if (data == null) {
@@ -87,11 +116,11 @@
 					return
 				}
 
-				var names = document.querySelector('main .names')
-				var times = document.querySelector('main .times')
+				names = document.querySelector('main #names')
+				times = document.querySelector('main #times')
 
-				names.innerHTML = '<div class="row"><span>Names</span></div>'
-				times.innerHTML = '<div class="row" id="timeheader"></div>'
+				names.innerHTML = ''
+				times.innerHTML = ''
 
 				var startInput = document.querySelector('input#start')
 				var endInput   = document.querySelector('input#end')
@@ -112,10 +141,14 @@
 					content += '<span style="left:'+left+'px;">'+t+'</span>'
 					tc.setTime(tc.getTime() + (60*60*1000));
 				}
-				var timeheader = document.getElementById('timeheader')
+				var timeheader = document.getElementById('timelabels')
 				timeheader.innerHTML = content
 
-				times.style.width = ((endDate - startDate) / (1000 * 60)) + 'px'
+				var viewwidth = ((endDate - startDate) / (1000 * 60))
+				timeheader.style.width = viewwidth + 'px'
+				times.style.width = viewwidth + 'px'
+
+				var rowCount = 0
 
 				for (var [name, list] of Object.entries(data)) {
 
@@ -151,13 +184,16 @@
 					if (rowHasRoom) {
 						var vname = name.replace('-', ' ')
 						names.innerHTML += '<div class="row"><span>'+vname+'</span></div>'
-
 						times.appendChild(row)
+						rowCount += 12
 					}
 
 				}
 
-				var tw = document.querySelector('main .timewrap')
+				//var viewheight = rowCount * 32;
+				//times.style.height = viewheight + 'px'
+
+				var tw = document.querySelector('main .scroll')
 				tw.scrollLeft = tw.scrollWidth
 
 			}
@@ -197,6 +233,14 @@
 
 			document.querySelector('input#end').value =
 				localISODate.split(':').slice(0,2).join(':')
+
+			var scrollbox = document.querySelector('.scroll')
+			var timehead = document.querySelector('#timeheader')
+			var namebox = document.querySelector('section.names')
+			scrollbox.onscroll = function() {
+				timehead.scrollLeft = scrollbox.scrollLeft
+				namebox.scrollTop = scrollbox.scrollTop
+			}
 
 			loadData()
 		</script>

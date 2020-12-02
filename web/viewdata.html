@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FTracker Data</title>
+		<meta name="theme-color" content="#c50e1f">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<style>
+			html, body {
+				margin: 0;
+				height: 100%;
+				font-family: sans-serif;
+			}
+			header {
+				height: calc(42px - 16px);
+				padding: 8px;
+			}
+			main {
+				height: calc(100% - 42px);
+				overflow-Y: scroll;
+				vertical-align: top;
+			}
+			main > section {
+				height: 100%;
+				display: inline-block;
+				vertical-align: top;
+			}
+			main > section.names {
+				width: 127px;
+				border-right: 1px solid gray;
+			}
+			main > section.timewrap {
+				width: calc(100% - 128px);
+				overflow-X: scroll;
+			}
+			.times {
+				overflow-X: hidden;
+			}
+			.row {
+				position: relative;
+				height: 2em;
+				background-size: 60px 100%;
+			}
+			.names .row:nth-child(odd)  { background: #ddd; }
+			.names .row:nth-child(even) { background: #eee; }
+			.times .row:nth-child(odd)  {
+				background-image: linear-gradient(to right, #bbb 1px, #ddd 1px);
+			}
+			.times .row:nth-child(even) {
+				background-image: linear-gradient(to right, #bbb 1px, #eee 1px);
+			}
+			.row > span {
+				padding: 7px;
+				display: inline-block;
+			}
+			.names {
+				font-weight: bold;
+				text-transform: capitalize;
+			}
+			.times span {
+				position: absolute;
+				background: #c50e1f;
+				color: #ddd;
+				margin-right: 16px;
+			}
+			#timeheader span {
+				background: none;
+				color: #444;
+				padding-left: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			Start: <input type="datetime-local" id="start" value="2020-12-01T00:00" onchange="renderData()">
+			Ende: <input type="datetime-local" id="end" onchange="renderData()">
+			Raum: <input type="text" id="room" placeholder=".* (regex)" onchange="renderData()">
+		</header>
+		<main>
+			<section class="names"></section><section class="timewrap"><div class="times"></div></section>
+		</main>
+		<script>
+			var data = null;
+			function renderData() {
+
+				if (data == null) {
+					alert('No data found.')
+					return
+				}
+
+				var names = document.querySelector('main .names')
+				var times = document.querySelector('main .times')
+
+				names.innerHTML = '<div class="row"><span>Names</span></div>'
+				times.innerHTML = '<div class="row" id="timeheader"></div>'
+
+				var startInput = document.querySelector('input#start')
+				var endInput   = document.querySelector('input#end')
+				var roomInput  = document.querySelector('input#room')
+
+				var startDate = new Date(startInput.value)
+				var endDate   = new Date(endInput.value)
+				var roomRE    = new RegExp(roomInput.value || '.*')
+
+				var tc = new Date(startDate.getTime())
+				var content = ''
+				while (tc < endDate) {
+					var h = tc.getHours()
+					var t = (h == 0) ?
+						'<b>'+tc.getDate()+'.'+(tc.getMonth()+1)+'.</b>' :
+						h+':00'
+					var left = ((tc - startDate) / (1000 * 60))
+					content += '<span style="left:'+left+'px;">'+t+'</span>'
+					tc.setTime(tc.getTime() + (60*60*1000));
+				}
+				var timeheader = document.getElementById('timeheader')
+				timeheader.innerHTML = content
+
+				times.style.width = ((endDate - startDate) / (1000 * 60)) + 'px'
+
+				for (var [name, list] of Object.entries(data)) {
+
+					var row = document.createElement('div')
+					row.classList.add('row')
+
+					var rowHasRoom = false
+
+					for (entry of list) {
+
+						if (entry.room.match(roomRE) == null)
+							continue
+
+						rowHasRoom = true
+
+						arrD = new Date(entry.arrival)
+						depD = entry.departure ? new Date(entry.departure) : endDate
+
+						// Minutes since start date / beginning
+						var arr = (arrD - startDate) / (1000 * 60)
+						var dep = (depD - startDate) / (1000 * 60)
+						var dur = dep - arr
+
+						var block = document.createElement('span')
+						block.innerHTML = entry.room
+						block.style.left  = arr + 'px' // 1px/min
+						block.style.width = (dur-14) + 'px' // 1px/min
+
+						row.appendChild(block)
+
+					}
+
+					if (rowHasRoom) {
+						var vname = name.replace('-', ' ')
+						names.innerHTML += '<div class="row"><span>'+vname+'</span></div>'
+
+						times.appendChild(row)
+					}
+
+				}
+
+				var tw = document.querySelector('main .timewrap')
+				tw.scrollLeft = tw.scrollWidth
+
+			}
+
+			function saveData(rdata) {
+
+				data = rdata.reduce((acc, entry) => {
+					var name = entry.name
+					delete entry.name
+					acc[name] = [...acc[name] || [], entry];
+					return acc;
+				}, {});
+
+				console.log(data)
+				renderData()
+
+			}
+
+			function loadData() {
+
+				fetch('/data')
+					.then(res => {
+						if (Math.floor(res.status / 100) == 2)
+							return res.json()
+						else
+							res.text().then(function (text) {
+								alert(text + "\nRestart your browser (yes, all tabs and windows) to relogin")
+							})
+					})
+					.then(rdata => saveData(rdata))
+
+			}
+
+			var now = new Date()
+			var localISODate = new Date(now.getTime() -
+				(now.getTimezoneOffset() * 60000)).toISOString();
+
+			document.querySelector('input#end').value =
+				localISODate.split(':').slice(0,2).join(':')
+
+			loadData()
+		</script>
+	</body>
+</html>

@@ -62,11 +62,11 @@ def post_arrival():
 			'message': "Error: Undeparted arrival exists"
 		}, indent=SPACES), 409
 
-	now = datetime.utcnow()
+	now = datetime.utcnow().isoformat() + 'Z'
 	db.insert({
 		'name': name,
 		'room': data['room'],
-		'arrival': data.get('arrival') or now.isoformat(),
+		'arrival': data.get('arrival') or now,
 		'departure': None
 	})
 
@@ -102,9 +102,9 @@ def post_departure():
 			'message': "Error: No arrival exists"
 		}, indent=SPACES), 409
 
-	now = datetime.utcnow()
+	now = datetime.utcnow().isoformat() + 'Z'
 	db.update(
-		operations.set('departure', data.get('departure') or now.isoformat()),
+		operations.set('departure', data.get('departure') or now),
 		(Entry.name == name) & (Entry.departure == None)
 	)
 

@@ -7,6 +7,10 @@ if __name__ == "__main__":
 	def get_root():
 		return app.send_static_file('index.html')
 
+	@app.route('/view')
+	def get_view():
+		return app.send_static_file('viewdata.html')
+
 	@app.route('/<path:path>')
 	def get_file(path):
 		return app.send_static_file(path)

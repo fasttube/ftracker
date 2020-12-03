@@ -28,7 +28,7 @@ class NameList:
 	def __contains__(self, val):
 		# Don't check if there's no list
 		if self.names == None:
-			return true;
+			return True;
 
 		contained = val in self.names
 

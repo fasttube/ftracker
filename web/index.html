@@ -88,15 +88,11 @@
 			function getParams() {
 				var h = document.location.href
 				var qparam = h.split('?')[1] || null
-				if (qparam == null) {
-					alert("Query parameter(s) missing")
+				if (qparam == null)
 					return null
-				}
 				var vals = qparam.split('=')
-				if (vals.length < 2 || !cbt.hasOwnProperty(vals[0])) {
-					alert("Invalid query parameter")
+				if (vals.length < 2 || !cbt.hasOwnProperty(vals[0]))
 					return null
-				}
 				return {
 					action: vals[0],
 					room: vals[1]
@@ -107,7 +103,10 @@
 	</head>
 	<body>
 		<h1><script>
-			document.write(qp.action + "<br>Room " + qp.room)
+			if (qp)
+				document.write(qp.action + "<br>Room " + qp.room)
+			else
+				document.write('FTracker<br>V1')
 		</script></h1>
 		<form id="mainform">
 			<label>
@@ -116,19 +115,39 @@
 			</label>
 			<label id="agreelabel">
 				<input type="checkbox" name="agree" id="agree" required>
-				<span><script>document.write(cbt[qp.action])</script></span>
+				<span><script>
+					document.write(qp ? cbt[qp.action] : '')
+				</script></span>
 			</label>
 			<input type="submit">
 		</form>
 		<script>
+			var mform = document.getElementById('mainform')
+			if (qp == null) {
+				mform.innerHTML = 'This is a web app to track which people\
+				were in the same rooms at which times in order to backtrace\
+				potential viral infections.<br><br>\
+				If you\'ve reached this page that either means your\'re\
+				testing things or something has gone quite wrong with the\
+				URL.<br>\
+				In the former case: Yay it works! In the latter you should\
+				probably contact an admin or a dev nearby :(<br><br>\
+				Here are a few links for testing:<br>\
+				<a href="/view">View Data</a>, \
+				<a href="/?arrival=42">Test Arrival</a>, \
+				<a href="/?departure=42">Test Departure</a><br><br>\
+				© 2020 made by <a target="_blank" href="mailto:&#111;&#46;&#119;&#105;&#110;&#107;&#101;&#108;&#115;&#64;&#102;&#97;&#115;&#116;&#116;&#117;&#98;&#101;&#46;&#100;&#101;">Oskar</a> \
+				for <a target="_blank" href="//fasttube.de">FaSTTUBe</a>. \
+				For source code & licensing see <a href="//git.fasttube.de/FaSTTUBe/ftracker">git repo</a>'
+			}
+
 			// Prefill the name field if it was successfully entered before
 			var savedName = localStorage.getItem('name')
-			if (savedName)
+			if (savedName && qp)
 				document.getElementById('name').value = savedName
 
 			// 2nd script, server API communication
 			var name, agreed
-			var mform = document.getElementById('mainform')
 			mform.onsubmit = function(e) {
 
 				e.preventDefault()

@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
 	@app.route('/view')
 	def get_view():
-		return app.send_static_file('viewdata.html')
+		return app.send_static_file('view.html')
 
 	@app.route('/<path:path>')
 	def get_file(path):

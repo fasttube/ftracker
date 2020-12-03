@@ -1,0 +1,17 @@
+[Unit]
+Description=FaSTTUBe Corona Tracker
+After=syslog.target network.target nginx.service
+
+# Configuration mostly stolen from from uwsgi docs
+[Service]
+User=www-data
+ExecStart=/usr/bin/uwsgi --ini /root/ft-corona-tracker/res/ftracker.uwsgi.ini
+RuntimeDirectory=uwsgi
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target

@@ -15,7 +15,7 @@ rcvar="ftracker_enable"
 
 pidfile="/var/run/${name}.pid"
 logfile="/var/log/${name}.log"
-configfile="/root/ft-corona-tracker/res/ftracker.uwsgi.ini"
+configfile="/root/ftracker/res/ftracker.uwsgi.ini"
 
 command="/usr/local/bin/uwsgi";
 command_args="--ini ${configfile} --daemonize ${logfile} --pidfile ${pidfile}"

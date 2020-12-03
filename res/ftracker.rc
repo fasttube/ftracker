@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# PROVIDE: ftracker
+# REQUIRE: LOGIN DAEMON NETWORKING
+# KEYWORD: fasttube corona tracker
+
+# Enable this script by adding:
+# ftracker_enable="YES"
+# ... to /etc/rc.conf
+
+. /etc/rc.subr
+
+name="ftracker"
+rcvar="ftracker_enable"
+
+pidfile="/var/run/${name}.pid"
+logfile="/var/log/${name}.log"
+configfile="/root/ft-corona-tracker/res/ftracker.uwsgi.ini"
+
+command="/usr/local/bin/uwsgi";
+command_args="--ini ${configfile} --daemonize ${logfile} --pidfile ${pidfile}"
+
+sig_stop="INT"
+sig_reload="TERM"
+
+load_rc_config $name
+run_rc_command "$1"

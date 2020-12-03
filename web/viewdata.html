@@ -11,11 +11,11 @@
 				font-family: sans-serif;
 			}
 			header {
-				height: calc(42px - 16px);
+				height: calc(38px - 16px);
 				padding: 8px;
 			}
 			main {
-				height: calc(100% - 42px);
+				height: calc(100% - 38px);
 				vertical-align: top;
 			}
 			main > section {
@@ -33,9 +33,6 @@
 				border-right: 1px solid gray;
 				font-weight: bold;
 				text-transform: capitalize;
-			}
-			main #names {
-				padding-bottom: 32px;
 			}
 			main > section.times, #timeheader {
 				width: calc(100% - 128px);
@@ -70,14 +67,53 @@
 				margin-right: 16px;
 			}
 			.viewheader.row {
-				height: 31px;
+				height: 30px;
 				background: #ddd !important;
+				border-top: 1px solid gray;
 				border-bottom: 1px solid gray;
 			}
 			.viewheader span {
 				background: none !important;
-				color: #444 !important;
+				color: #000 !important;
 				padding-left: 4px;
+			}
+			#credprompt {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				width: 95%;
+				max-width: 320px;
+				margin: auto;
+				background: #ddd;
+				box-shadow: 0 0 0 10000px rgba(0,0,0,.75);
+			}
+			#credprompt h1 {
+				margin: 0;
+				padding: 16px;
+				text-transform: uppercase;
+				color: #eee;
+				background: #c50e1f;
+				text-align: center;
+			}
+			#credprompt input {
+				display: block;
+				border: none;
+				margin: 16px auto;
+				padding: 16px;
+				font-size: 16px;
+			}
+			#credprompt input[type=text],
+			#credprompt input[type=password] {
+				color: #000;
+				width: calc(100% - 64px);
+			}
+			#credprompt input[type=submit] {
+				background: #c50e1f;
+				text-transform: uppercase;
+				font-weight: bold;
+				color: #fff;
+				width: calc(100% - 32px);
 			}
 		</style>
 	</head>
@@ -86,16 +122,17 @@
 			Start: <input type="datetime-local" id="start" value="2020-12-01T00:00" onchange="renderData()">
 			Ende: <input type="datetime-local" id="end" onchange="renderData()">
 			Raum: <input type="text" id="room" placeholder=".* (regex)" onchange="renderData()">
+			<input type="button" value="Log Out" style="float:right" onclick="localStorage.removeItem('dataauth'); location.reload()">
 		</header>
 		<main>
 			<div class="row viewheader" id="nameheader">
 				<span><b>Names</b></span>
 			</div><!--
 		 --><div class="row viewheader" id="timeheader">
-				<div id="timelabels"></div>
+				<div id="timelabels" style="padding-right: 32px;"></div>
 			</div>
 			<section class="names">
-				<div id="names"></div>
+				<div id="names" style="padding-bottom: 32px;"></div>
 			</section><!--
 		 --><section class="times">
 				<div class="scroll">
@@ -212,15 +249,48 @@
 
 			}
 
+			function submitCredentials() {
+				var cp = document.querySelector('#credprompt')
+				var user = cp.querySelector('#user').value
+				var pass = cp.querySelector('#pass').value
+				cp.remove()
+				var auth = btoa(user + ":" + pass)
+				localStorage.setItem('dataauth', auth)
+				loadData()
+			}
+
 			function loadData() {
 
-				fetch('/data')
+				var auth = localStorage.getItem('dataauth')
+				if (auth == null) {
+					var prompt = document.createElement('div')
+					prompt.id = 'credprompt'
+					prompt.innerHTML = '<h1>Credentials Required</h1>\
+						<input type="text" id="user" placeholder="username" onkeydown="if (event.keyCode == 13) {submitCredentials()}">\
+						<input type="password" id="pass" placeholder="password" onkeydown="if (event.keyCode == 13) {submitCredentials()}">\
+						<input type="submit" onclick="submitCredentials()">'
+					document.body.appendChild(prompt)
+					document.querySelector('#credprompt #user').focus()
+					return // Abort load, wait for submit
+				}
+
+				var headers = new Headers()
+				headers.append('Authorization', 'Basic ' + auth)
+
+				var fetchopts = {
+					method: 'GET',
+					headers: headers
+				}
+
+				fetch('/data', fetchopts)
 					.then(res => {
 						if (Math.floor(res.status / 100) == 2)
 							return res.json()
 						else
+							localStorage.removeItem('dataauth')
 							res.text().then(function (text) {
-								alert(text + "\nRestart your browser (yes, all tabs and windows) to relogin")
+								alert(text)
+								location.reload()
 							})
 					})
 					.then(rdata => saveData(rdata))

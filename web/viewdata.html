@@ -227,12 +227,16 @@
 
 			}
 
-			var now = new Date()
-			var localISODate = new Date(now.getTime() -
-				(now.getTimezoneOffset() * 60000)).toISOString();
+			function localISOTimeMinutes(date) {
 
-			document.querySelector('input#end').value =
-				localISODate.split(':').slice(0,2).join(':')
+				var tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
+				var localISOTime = (new Date(date - tzoffset)).toISOString().slice(0, -1);
+
+				return localISOTime.split(':').slice(0,2).join(':')
+
+			}
+
+			document.querySelector('input#end').value = localISOTimeMinutes(new Date())
 
 			var scrollbox = document.querySelector('.scroll')
 			var timehead = document.querySelector('#timeheader')

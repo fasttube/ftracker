@@ -223,6 +223,15 @@
 
 			}
 
+			function localISOTimeMinutes(date) {
+
+				var tzoffset = date.getTimezoneOffset() * 60000; //offset in milliseconds
+				var localISOTime = (new Date(date - tzoffset)).toISOString().slice(0, -1);
+
+				return localISOTime.split(':').slice(0,2).join(':')
+
+			}
+
 			function handleRequest(res) {
 
 				var reqt = {
@@ -240,10 +249,10 @@
 						var d = new Date(json.arrival.time)
 						var dInfo = d.toString('en-GB').split(' ').slice(0,5).join(' ')
 						aInfo = `Your last arrival was on <b>${dInfo}</b> in room <b>${json.arrival.room}</b>.`
-						minD = `min="${json.arrival.time.split(':').slice(0,2).join(':')}"`
+						minD = `min="${localISOTimeMinutes(d)}"`
 					}
 
-					var now = new Date().toISOString().split(':').slice(0,2).join(':')
+					var now = localISOTimeMinutes(new Date())
 
 					document.body.innerHTML +=
 						`<div class="request">

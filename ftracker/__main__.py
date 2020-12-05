@@ -1,3 +1,4 @@
+import os
 from .core import *
 
 # Start the flask server if run from terminal
@@ -7,12 +8,15 @@ if __name__ == "__main__":
 	def get_root():
 		return app.send_static_file('index.html')
 
-	@app.route('/view')
-	def get_view():
-		return app.send_static_file('view.html')
-
 	@app.route('/<path:path>')
-	def get_file(path):
+	def get_path(path):
+		fpath = f"{app.static_folder}/{path}"
+
+		# Prettier URLs by auto-loading <path>.html
+		# Our nginx config does this as well
+		if not os.path.isfile(fpath):
+			return app.send_static_file(path + '.html')
+
 		return app.send_static_file(path)
 
 	# Just allow everything to avoid the hassle when running locally.

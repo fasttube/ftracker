@@ -61,9 +61,14 @@ Edit `config.ini` to your liking. Restart the backend by restarting the `uwsgi`
 service, e.g. `sudo systemctl restart ftracker` or `sudo service ftracker
 restart`
 
+## Open Sources
+
+This project uses the `QRCode.js` library (Copyright (C) 2012 davidshimjs)
+licensed under the MIT License, see `web/qrcodejs/LICENSE`. Thanks!
+
 ## License
 
-Licensed under GNU GPL v3, see
+FTracker is licensed under the GNU GPL v3 license, see
 [LICENSE.md](https://git.fasttube.de/FaSTTUBe/ft-corona-tracker/src/branch/master/LICENSE.md)
 for details.
 

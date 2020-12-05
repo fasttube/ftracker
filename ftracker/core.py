@@ -125,7 +125,12 @@ def get_data():
 
 	start = request.args.get('start', default = None, type = str)
 	end   = request.args.get('end'  , default = None, type = str)
-	room  = request.args.get('room' , default = ".*", type = str)
+	room  = request.args.get('room' , default = None, type = str)
+
+	# Skip DB query if no parameters given
+	# (Which is currently every request)
+	if not (start or end or room):
+		return json.dumps(db.all(), indent=SPACES), 200
 
 	def is_after(val, iso):
 		return (val >= iso if val else True ) if iso else True
@@ -137,7 +142,7 @@ def get_data():
 	r = db.search(
 		(Entry.departure.test(is_after, start)) &
 		(Entry.arrival.test(is_before, end)) &
-		(Entry.room.search(room))
+		(Entry.room.search(room or ".*"))
 	)
 
 	return json.dumps(r, indent=SPACES), 200

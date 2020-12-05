@@ -13,6 +13,8 @@
 			header {
 				height: calc(38px - 16px);
 				padding: 8px;
+				white-space: nowrap;
+				overflow: hidden;
 			}
 			main {
 				height: calc(100% - 38px);
@@ -28,14 +30,15 @@
 				vertical-align: top;
 			}
 			main > section.names, #nameheader {
-				width: 127px;
+				width: 199px;
 				overflow: hidden;
 				border-right: 1px solid gray;
 				font-weight: bold;
 				text-transform: capitalize;
+				white-space: nowrap;
 			}
 			main > section.times, #timeheader {
-				width: calc(100% - 128px);
+				width: calc(100% - 200px);
 				overflow: hidden;
 			}
 			.scroll {

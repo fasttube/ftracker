@@ -28,15 +28,58 @@ Then, point your browser at <http://localhost:5000/>.
 
 ## Installation/Deployment
 
-### 1. FTracker Backend
+There are 2 methods: Docker and Manual.
 
-As above:
+### Method A: Docker
+
+If you want to manage SSL in your own webserver, you can simply run
+
 ```bash
-# clone, cd into repo
-pip install . # Use -e if you want to hack on the backend while installed.
+sudo docker run \
+	-d \
+	--name ftracker \
+	-p 80:80 \
+	-v /your/full/path/to/config.ini:/etc/ftracker/config.ini \
+	fasttube/ftracker
 ```
 
-### 2. WSGI Server + Service file
+If you want the container to also handle SSL so it can run standalone you need
+to build it like this:
+
+```bash
+# clone, cd into repo
+sudo docker build . -t ftracker --build-arg DOMAIN=ftracker.example.com
+```
+
+And then run it:
+
+```bash
+sudo docker run \
+	-d \
+	--name ftracker \
+	-p 80:80 \
+	-v /your/full/path/to/config.ini:/etc/ftracker/config.ini \
+	ftracker
+```
+
+To stop/start the container afterwards, run:
+
+```bash
+docker stop ftracker # might take up to 10 seconds
+docker start ftracker
+```
+
+### Method B: Manual
+
+#### 1. FTracker Backend
+
+Install backend system wide:
+```bash
+# clone, cd into repo
+sudo -H pip install . # Use -e if you want to hack on the backend while installed.
+```
+
+#### 2. WSGI Server + Service file
 
 You need a WSGI Middleware (using `Flask`'s included `werkzeug` is discouraged
 for production environments). I recommend `uwsgi` since it's flexible, fast and
@@ -45,7 +88,7 @@ description files for both `systemd` and `rc` are included in `res/` for you to
 adapt (file paths etc.) and install to your system (The `systemd` service file
 still untested though, feel free to leave feedback).
 
-### 3. Webserver
+#### 3. Webserver
 
 You need a webserver. I recommend `nginx` because it's the industry standard
 and fast. A sample config file is included in `res/` for you to adapt (domain,
@@ -55,7 +98,7 @@ Webroot in `web/` with a fallback to the WSGI handler for the backend.
 Enabling SSL (https) and redirecting http to https is strongly encouraged, i
 recommend using `Let's Encrypt`'s `certbot` to easily obtain certificates.
 
-### 4. Customization
+#### 4. Customization
 
 Edit `config.ini` to your liking. Restart the backend by restarting the `uwsgi`
 service, e.g. `sudo systemctl restart ftracker` or `sudo service ftracker

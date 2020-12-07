@@ -32,26 +32,30 @@ There are 2 methods: Docker and Manual.
 
 ### Method A: Docker
 
-If you want to manage SSL in your own webserver, you can simply run
+Build the container with
+
+```bash
+sudo docker build . -t ftracker
+```
+
+Then, if you want the container to also handle SSL so it can run standalone you
+need to pass it a domain and Email so it can obtain a certificate from `Let's
+encrypt`:
 
 ```bash
 sudo docker run \
 	-d \
 	--name ftracker \
+	-e DOMAIN=example.com \
+	-e LE_EMAIL=admin@example.com \
 	-p 80:80 \
+	-p 443:443 \
 	-v /your/full/path/to/config.ini:/etc/ftracker/config.ini \
-	fasttube/ftracker
+	ftracker
 ```
 
-If you want the container to also handle SSL so it can run standalone you need
-to build it like this:
-
-```bash
-# clone, cd into repo
-sudo docker build . -t ftracker --build-arg DOMAIN=ftracker.example.com
-```
-
-And then run it:
+Otherwise you can run it without SSL (maybe behind your own web+ssl server)
+using just
 
 ```bash
 sudo docker run \
@@ -62,11 +66,12 @@ sudo docker run \
 	ftracker
 ```
 
-To stop/start the container afterwards, run:
+To stop/start/uninstall the container afterwards, run:
 
 ```bash
-docker stop ftracker # might take up to 10 seconds
-docker start ftracker
+docker stop ftracker  # might take up to 10 seconds
+docker start ftracker # continue runniing
+docker rm -f ftracker # uninstall
 ```
 
 ### Method B: Manual

@@ -45,8 +45,8 @@ sudo docker build . -t fasttube/ftracker
 ```
 
 Then, if you want the container to also handle SSL so it can run standalone you
-need to pass it a domain and Email so it can obtain a certificate from `Let's
-encrypt`:
+need to pass it a domain and email so it can obtain a certificate from `Let's
+encrypt`. Use the first path in the `-v` option to point to your config file:
 
 ```bash
 sudo docker run \
@@ -72,14 +72,15 @@ sudo docker run \
 	fasttube/ftracker
 ```
 
-If those work in the foreground and averything looks okay, you can start them
-without `-it --rm` and with `-d` instead to run them in the background.
+If those work in the foreground and everything looks okay, you can start them
+without `-it --rm` and with `-d` instead to run them in the background. Keep in
+mind that it can take around 10 seconds to fully start.
 
 To stop/start/uninstall the container afterwards, run:
 
 ```bash
-docker stop ftracker  # might take up to 10 seconds
-docker start ftracker # continue runniing
+docker stop ftracker  # might take a few seconds
+docker start ftracker # continue running
 docker rm -f ftracker # uninstall
 ```
 

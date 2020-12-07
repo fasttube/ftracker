@@ -32,10 +32,16 @@ There are 2 methods: Docker and Manual.
 
 ### Method A: Docker
 
-Build the container with
+Pull the container from docker hub using
 
 ```bash
-sudo docker build . -t ftracker
+sudo docker pull fasttube/ftracker
+```
+
+OR build the container locally with
+
+```bash
+sudo docker build . -t fasttube/ftracker
 ```
 
 Then, if you want the container to also handle SSL so it can run standalone you
@@ -44,14 +50,14 @@ encrypt`:
 
 ```bash
 sudo docker run \
-	-d \
+	-it --rm \
 	--name ftracker \
 	-e DOMAIN=example.com \
 	-e LE_EMAIL=admin@example.com \
 	-p 80:80 \
 	-p 443:443 \
 	-v /your/full/path/to/config.ini:/etc/ftracker/config.ini \
-	ftracker
+	fasttube/ftracker
 ```
 
 Otherwise you can run it without SSL (maybe behind your own web+ssl server)
@@ -59,12 +65,15 @@ using just
 
 ```bash
 sudo docker run \
-	-d \
+	-it --rm \
 	--name ftracker \
 	-p 80:80 \
 	-v /your/full/path/to/config.ini:/etc/ftracker/config.ini \
-	ftracker
+	fasttube/ftracker
 ```
+
+If those work in the foreground and averything looks okay, you can start them
+without `-it --rm` and with `-d` instead to run them in the background.
 
 To stop/start/uninstall the container afterwards, run:
 

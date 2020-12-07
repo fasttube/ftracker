@@ -27,4 +27,4 @@ fi
 
 echo " >>> Starting uwsgi <<< "
 
-/usr/sbin/uwsgi --ini /root/ftracker/res/ftracker.alpine.uwsgi.ini
+exec /usr/sbin/uwsgi --ini /root/ftracker/res/ftracker.alpine.uwsgi.ini

@@ -29,5 +29,6 @@ RUN mkdir -p /etc/ftracker /var/ftracker \
 
 
 
+STOPSIGNAL SIGINT
 RUN chmod +x ./res/docker-entrypoint.sh
 ENTRYPOINT [ "./res/docker-entrypoint.sh" ]

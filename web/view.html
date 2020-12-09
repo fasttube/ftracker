@@ -203,7 +203,7 @@
 							continue
 
 						arrD = new Date(entry.arrival)
-						depD = entry.departure ? new Date(entry.departure) : endDate
+						depD = entry.departure ? new Date(entry.departure) : new Date()
 
 						if (depD < startDate || arrD > endDate)
 							continue

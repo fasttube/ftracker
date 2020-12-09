@@ -195,17 +195,20 @@
 					var row = document.createElement('div')
 					row.classList.add('row')
 
-					var rowHasRoom = false
+					var rowHasBlock = false
 
 					for (entry of list) {
 
 						if (entry.room.match(roomRE) == null)
 							continue
 
-						rowHasRoom = true
-
 						arrD = new Date(entry.arrival)
 						depD = entry.departure ? new Date(entry.departure) : endDate
+
+						if (depD < startDate || arrD > endDate)
+							continue
+
+						rowHasBlock = true
 
 						// Minutes since start date / beginning
 						var arr = (arrD - startDate) / (1000 * 60)
@@ -221,7 +224,7 @@
 
 					}
 
-					if (rowHasRoom) {
+					if (rowHasBlock) {
 						var vname = name.replace('-', ' ')
 						names.innerHTML += '<div class="row"><span>'+vname+'</span></div>'
 						times.appendChild(row)

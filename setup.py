@@ -8,13 +8,13 @@ with open('LICENSE.md') as f:
 
 st.setup(
 	name="ftracker",
-	version="0.1.0",
+	version="1.0.0",
 	author="Oskar @ FaSTTUBe",
 	author_email="o.winkels@fasttube.de",
 	description="Small webapp to track who was in which room at which time to backtrace potential viral infections",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
-	url="https://git.fasttube.de/FaSTTUBe/ft-corona-tracker",
+	url="https://git.fasttube.de/FaSTTUBe/ftracker",
 	packages=st.find_packages(exclude=['tests', 'docs']),
 	install_requires=[
 		"flask",

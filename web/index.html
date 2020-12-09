@@ -51,7 +51,7 @@
 				color: #000;
 				width: calc(100% - 32px);
 			}
-			input[type=submit] {
+			input[type=submit], input[type=button] {
 				background: #c50e1f;
 				text-transform: uppercase;
 				font-weight: bold;
@@ -271,11 +271,15 @@
 
 					var aInfo = ''
 					var minD = ''
+					var doubleT = ''
 					if (json.request == 'departure') {
 						var d = new Date(json.arrival.time)
 						var dInfo = d.toString('en-GB').split(' ').slice(0,5).join(' ')
 						aInfo = `Your last arrival was on <b>${dInfo}</b> in room <b>${json.arrival.room}</b>.`
 						minD = `min="${localISOTimeMinutes(d)}"`
+						if (new Date() - d < 3 * 60 * 1000) {
+							doubleT = '<b style="color:red">Your last sign in was less than 3 minutes ago. You might be accidentally trying to sign in twice. If you don\'t intend to log 2 arrivals within the last 3 minutes, please abort below.</b>'
+						}
 					}
 
 					var now = localISOTimeMinutes(new Date())
@@ -289,7 +293,9 @@
 									<input type="datetime-local" id="datetime" ${minD} max="${now}" required>
 									${aInfo}
 								</label>
+								${doubleT}
 								<input type="submit">
+								<input type="button" value="Abort" onclick="document.body.innerHTML='<h1>Aborted</h1><form>Nothing was logged.<br>You can close this tab/window now.</form>'">
 							</form>
 						</div>`
 

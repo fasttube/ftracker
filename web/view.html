@@ -225,7 +225,7 @@
 					}
 
 					if (rowHasBlock) {
-						var vname = name.replace('-', ' ')
+						var vname = name.replace(/-/g, ' ')
 						names.innerHTML += '<div class="row"><span>'+vname+'</span></div>'
 						times.appendChild(row)
 						rowCount += 12

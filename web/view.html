@@ -65,9 +65,16 @@
 			}
 			.times span, #timeheader span {
 				position: absolute;
+				margin-right: 16px;
+			}
+			.times span {
 				background: #c50e1f;
 				color: #ddd;
-				margin-right: 16px;
+				font-weight: bold;
+				-webkit-text-stroke: .4px #c50e1f;
+			}
+			.times span.implausible {
+				background: linear-gradient(to right, #c50e1f, rgba(197,14,31,0.2) 1000px);
 			}
 			.viewheader.row {
 				height: 30px;
@@ -218,7 +225,10 @@
 						var block = document.createElement('span')
 						block.innerHTML = entry.room
 						block.style.left  = arr + 'px' // 1px/min
-						block.style.width = (dur-14) + 'px' // 1px/min
+						block.style.width = Math.max(0,(dur-14)) + 'px' // 1px/min
+
+						if (dur > 60 * 24)
+							block.classList.add('implausible')
 
 						row.appendChild(block)
 

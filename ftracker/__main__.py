@@ -1,5 +1,5 @@
 import os
-from .core import *
+from .core import app
 
 # Start the flask server if run from terminal
 if __name__ == "__main__":

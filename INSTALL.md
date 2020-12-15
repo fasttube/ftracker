@@ -57,9 +57,9 @@ mind that it can take around 10 seconds to fully start.
 To stop/start/uninstall the container afterwards, run:
 
 ```bash
-docker stop ftracker  # might take a few seconds
-docker start ftracker # continue running
-docker rm -f ftracker # uninstall
+sudo docker stop ftracker  # might take a few seconds
+sudo docker start ftracker # continue running
+sudo docker rm -f ftracker # uninstall
 ```
 
 ### Method B: Manual

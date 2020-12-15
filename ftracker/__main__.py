@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from .core import app
 
 # Start the flask server if run from terminal
@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
 		# Prettier URLs by auto-loading <path>.html
 		# Our nginx config does this as well
-		if not os.path.isfile(fpath):
+		if not Path(fpath).is_file():
 			return app.send_static_file(path + '.html')
 
 		return app.send_static_file(path)

@@ -1,4 +1,5 @@
-import sys, os
+import sys
+from pathlib import Path
 from configparser import ConfigParser
 
 class Config:
@@ -8,9 +9,9 @@ class Config:
 		def findConfigFile():
 			if len(sys.argv) > 1:
 				return sys.argv[1]
-			elif os.path.isfile('config.ini'):
+			elif Path('config.ini').is_file():
 				return 'config.ini'
-			elif os.path.isfile('/etc/ftracker/config.ini'):
+			elif Path('/etc/ftracker/config.ini').is_file():
 				return '/etc/ftracker/config.ini'
 			else:
 				return None

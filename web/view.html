@@ -322,7 +322,11 @@
 
 			}
 
-			document.querySelector('input#end').value = localISOTimeMinutes(new Date())
+			var now = new Date()
+			var startDate = new Date()
+			startDate.setDate(now.getDate() - (4*7))
+			document.querySelector('input#start').value = localISOTimeMinutes(startDate)
+			document.querySelector('input#end').value = localISOTimeMinutes(now)
 
 			var scrollbox = document.querySelector('.scroll')
 			var timehead = document.querySelector('#timeheader')

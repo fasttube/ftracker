@@ -1,3 +1,4 @@
+import atexit
 import json
 from datetime import datetime
 from slugify import slugify
@@ -20,6 +21,17 @@ namelist = NameList(namefile)
 from flask import Flask, request, redirect
 app = Flask(__name__, static_folder='../web')
 
+
+if config['delete_after_days']:
+	from .deleter import Deleter
+	deleter = Deleter(db, int(config['delete_after_days']))
+
+def shutdown():
+	print('\rReceived stop signal, stopping threads...')
+	deleter.stop()
+	db.close()
+
+atexit.register(shutdown)
 
 @app.route('/guidelines')
 def get_guidelines():

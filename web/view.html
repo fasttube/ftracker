@@ -133,6 +133,7 @@
 			Ende: <input type="datetime-local" id="end" onchange="renderData()">
 			Raum: <input type="text" id="room" placeholder=".* (regex)" onchange="renderData()">
 			<input type="button" value="Log Out" style="float:right" onclick="localStorage.removeItem('dataauth'); location.reload()">
+			<input type="button" value="Export CSV" style="float:right; margin-right: 8px;" onclick="exportCSV()">
 		</header>
 		<main>
 			<div class="row viewheader" id="nameheader">
@@ -156,6 +157,91 @@
 			var names = document.querySelector('main #names')
 			var times = document.querySelector('main #times')
 
+			function exportCSV() {
+
+				if (data == null) {
+					alert('No data found.')
+					return
+				}
+
+				var startInput = document.querySelector('input#start')
+				var endInput   = document.querySelector('input#end')
+				var roomInput  = document.querySelector('input#room')
+
+				var startDate = new Date(startInput.value)
+				var endDate   = new Date(endInput.value)
+				var roomRE    = new RegExp(roomInput.value || '.*')
+
+				csv = '"ftracker-export",'
+				days = []
+
+				var tc = new Date(startDate.getTime())
+				tc.setHours(1,0,0,0)
+				while (tc < endDate) {
+					var isodate = tc.toISOString().split('T')[0]
+					csv += ('"' + isodate + '",')
+					days.push(isodate)
+					tc.setDate(tc.getDate() + 1);
+				}
+
+				csv = csv.replace(/,$/, '')
+
+				csv += '\n'
+
+				for (var [name, list] of Object.entries(data)) {
+
+					csv += '"' + name + '"'
+
+					for (day of days) {
+
+						csv += ',"'
+
+						daytexts = []
+
+						for (entry of list) {
+
+							if (entry.room.match(roomRE) == null)
+								continue
+
+							var arrD = new Date(entry.arrival)
+							var depD = entry.departure ? new Date(entry.departure) : new Date()
+
+							if (depD < startDate || arrD > endDate)
+								continue
+
+							var [arrDay, arrT] = localISOTimeMinutes(arrD).split('T')
+							var [depDay, depT] = localISOTimeMinutes(depD).split('T')
+
+							if ((arrDay == day) && (depDay == day)) {
+								daytexts.push(arrT + '-' + depT + ' (' + entry.room + ')')
+							} else if (arrDay == day) {
+								daytexts.push(arrT + '-... (' + entry.room + ')')
+							} else if (depDay == day) {
+								daytexts.push('...-' + depT + ' (' + entry.room + ')')
+							}
+
+						}
+
+						csv += daytexts.join('\n')
+
+						csv += '"'
+
+					}
+
+					csv += '\n'
+
+				}
+
+				var element = document.createElement('a');
+				element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv));
+				element.setAttribute('download', 'ftracker-export.csv');
+				element.style.display = 'none';
+				document.body.appendChild(element);
+				element.click();
+				document.body.removeChild(element);
+
+			}
+
 			function renderData() {
 
 				if (data == null) {
@@ -176,6 +262,10 @@
 				var startDate = new Date(startInput.value)
 				var endDate   = new Date(endInput.value)
 				var roomRE    = new RegExp(roomInput.value || '.*')
+
+				// Clear everything below hours because that would lead to
+				// misalignments with the day grid
+				startDate.setMinutes(0,0,0)
 
 				var tc = new Date(startDate.getTime())
 				var content = ''
@@ -209,8 +299,8 @@
 						if (entry.room.match(roomRE) == null)
 							continue
 
-						arrD = new Date(entry.arrival)
-						depD = entry.departure ? new Date(entry.departure) : new Date()
+						var arrD = new Date(entry.arrival)
+						var depD = entry.departure ? new Date(entry.departure) : new Date()
 
 						if (depD < startDate || arrD > endDate)
 							continue
@@ -325,6 +415,7 @@
 			var now = new Date()
 			var startDate = new Date()
 			startDate.setDate(now.getDate() - (4*7))
+			startDate.setHours(0,0,0,0)
 			document.querySelector('input#start').value = localISOTimeMinutes(startDate)
 			document.querySelector('input#end').value = localISOTimeMinutes(now)
 

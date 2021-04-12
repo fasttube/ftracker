@@ -1,0 +1,121 @@
+html, body {
+	margin: 0;
+	height: 100%;
+	font-family: sans-serif;
+}
+header {
+	height: calc(38px - 16px);
+	padding: 8px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+main {
+	height: calc(100% - 38px);
+	vertical-align: top;
+}
+main > section {
+	height: calc(100% - 32px);
+	display: inline-block;
+	vertical-align: top;
+}
+main > .viewheader {
+	display: inline-block;
+	vertical-align: top;
+}
+main > section.names, #nameheader {
+	width: 199px;
+	overflow: hidden;
+	border-right: 1px solid gray;
+	font-weight: bold;
+	text-transform: capitalize;
+	white-space: nowrap;
+}
+main > section.times, #timeheader {
+	width: calc(100% - 200px);
+	overflow: hidden;
+}
+.scroll {
+	height: 100%;
+	width: 100%;
+	overflow: scroll;
+}
+.row, .row #timelabels {
+	position: relative;
+	height: 32px;
+	background-size: 60px 100%;
+}
+.names .row:nth-child(even) { background: #ddd; }
+.names .row:nth-child(odd)  { background: #eee; }
+.times .row:nth-child(even) {
+	background-image: linear-gradient(to right, #bbb 1px, #ddd 1px);
+}
+.times .row:nth-child(odd)  {
+	background-image: linear-gradient(to right, #bbb 1px, #eee 1px);
+}
+.row span {
+	height: 18px;
+	padding: 7px;
+	display: inline-block;
+}
+.times span, #timeheader span {
+	position: absolute;
+	margin-right: 16px;
+}
+.times span {
+	background: #c50e1f;
+	color: #ddd;
+	font-weight: bold;
+	-webkit-text-stroke: .4px #c50e1f;
+}
+.times span.implausible {
+	background: linear-gradient(to right, #c50e1f, rgba(197,14,31,0.2) 1000px);
+}
+.viewheader.row {
+	height: 30px;
+	background: #ddd !important;
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
+.viewheader span {
+	background: none !important;
+	color: #000 !important;
+	padding-left: 4px;
+}
+#credprompt {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 95%;
+	max-width: 320px;
+	margin: auto;
+	background: #ddd;
+	box-shadow: 0 0 0 10000px rgba(0,0,0,.75);
+}
+#credprompt h1 {
+	margin: 0;
+	padding: 16px;
+	text-transform: uppercase;
+	color: #eee;
+	background: #c50e1f;
+	text-align: center;
+}
+#credprompt input {
+	display: block;
+	border: none;
+	margin: 16px auto;
+	padding: 16px;
+	font-size: 16px;
+}
+#credprompt input[type=text],
+#credprompt input[type=password] {
+	color: #000;
+	width: calc(100% - 64px);
+}
+#credprompt input[type=submit] {
+	background: #c50e1f;
+	text-transform: uppercase;
+	font-weight: bold;
+	color: #fff;
+	width: calc(100% - 32px);
+}

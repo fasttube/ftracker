@@ -77,6 +77,7 @@ def post_arrival():
 	now = datetime.utcnow().isoformat() + 'Z'
 	db.insert({
 		'name': name,
+		'tested': data.get('tested') or False,
 		'room': data['room'],
 		'arrival': data.get('arrival') or now,
 		'departure': None

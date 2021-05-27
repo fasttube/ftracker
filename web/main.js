@@ -51,6 +51,7 @@ function post(url, payload) {
 
 	return fetch(url, {
 		method: "POST",
+		headers: {'Content-Type': 'application/json'},
 		body: JSON.stringify(payload)
 	}).then(res => {
 		handleResponse(res)
@@ -92,13 +93,17 @@ function handleRequestSubmit(e, json) {
 	var input = e.srcElement[0].value
 	var iso = new Date(input).toISOString()
 
+	if (e.srcElement.length > 1)
+		tested = e.srcElement[1].checked
+
 	// POST JSON. See docs/API.md
 	var payload = (json.request == 'arrival') ?
 		{
 			'room': qp.room,
 			'name': name,
 			'arrival': iso,
-			'agreetoguidelines': agreed
+			'agreetoguidelines': agreed,
+			'tested': tested
 		} :
 		{
 			'name': name,
@@ -133,6 +138,7 @@ function handleRequest(res) {
 		var aInfo = ''
 		var minD = ''
 		var doubleT = ''
+		var testCheck = ''
 		if (json.request == 'departure') {
 			var d = new Date(json.arrival.time)
 			var dInfo = d.toString('en-GB').split(' ').slice(0,5).join(' ')
@@ -141,6 +147,8 @@ function handleRequest(res) {
 			if (new Date() - d < 3 * 60 * 1000) {
 				doubleT = '<b style="color:red">Your last sign in was less than 3 minutes ago. You might be accidentally trying to sign in twice. If you don\'t intend to log 2 arrivals within the last 3 minutes, please abort below.</b>'
 			}
+		} else if (json.request == 'arrival') {
+			testCheck = testCheckBox.replace('have', 'had then');
 		}
 
 		var now = localISOTimeMinutes(new Date())
@@ -155,12 +163,13 @@ function handleRequest(res) {
 						${aInfo}
 					</label>
 					${doubleT}
+					${testCheck}
 					<input type="submit">
 					<input type="button" value="Abort" onclick="document.body.innerHTML='<h1>Aborted</h1><form>Nothing was logged.<br>You can close this tab/window now.</form>'">
 				</form>
 			</div>`
 
-		rform = document.getElementById('reqform')
+		var rform = document.getElementById('reqform')
 		rform.onsubmit = async function(e) {
 			await handleRequestSubmit(e, json)
 			document.querySelector('.request').remove()

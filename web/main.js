@@ -1,7 +1,9 @@
+var pushServerPublicKey = 'BBwBPYxhogHLU3B1FpxfQNzO3q7qZpmD1n1KaaL8WJbcVmJSHhi1uB-VmvsVjjUHWYCeqKyLT7w-1LBfpIcbbcg'
+
 var spage = document.getElementById('startpage')
 var mform = document.getElementById('mainform')
 
-if (qp) {
+if (qp.action) {
 	spage.style.display = 'none'
 	mform.style.display = 'block'
 }
@@ -12,17 +14,25 @@ if (savedName && qp)
 	document.getElementById('name').value = savedName
 
 // 2nd script, server API communication
-var name, agreed, tested
+var name, datetime, agreed, tested
 mform.onsubmit = function(e) {
 
 	e.preventDefault()
 
-	name = e.srcElement[0].value
-	agreed = e.srcElement[1].checked
-	if (e.srcElement.length > 2)
-		tested = e.srcElement[2].checked
+	var i = 0;
+	name = e.srcElement[i++].value
+	if (qp.edittime && qp.edittime == 1) {
+		var value = e.srcElement[i++].value
+		datetime = new Date(value).toISOString()
+	}
+	agreed = e.srcElement[i++].checked
+	if (qp.action && qp.action == 'arrival')
+		tested = e.srcElement[i++].checked
+
 
 	sendMainData()
+
+	initPush(name)
 
 }
 
@@ -33,11 +43,13 @@ function sendMainData() {
 		{
 			'room': qp.room,
 			'name': name,
+			'arrival': datetime,
 			'agreetoguidelines': agreed,
 			'tested': tested
 		} :
 		{
 			'name': name,
+			'departure': datetime,
 			'cleanedworkspace': agreed
 		}
 
@@ -159,7 +171,7 @@ function handleRequest(res) {
 				<form id="reqform">
 					<label>
 						${reqt[json.request]}
-						<input type="datetime-local" id="datetime" ${minD} max="${now}" required>
+						<input type="datetime-local" ${minD} max="${now}" required>
 						${aInfo}
 					</label>
 					${doubleT}
@@ -177,5 +189,78 @@ function handleRequest(res) {
 		}
 
 	})
+
+}
+
+
+if (qp.edittime && qp.edittime == 1) {
+	var now = localISOTimeMinutes(new Date())
+	document.getElementById('datetime').value = now;
+	document.getElementById('datetime').max = now;
+}
+
+
+/* Push Notifications */
+
+function sendNotification() {
+
+	navigator.serviceWorker.ready.then(function(serviceWorker) {
+		serviceWorker.showNotification("Forgot to sign out?", {
+			body: "You didn't sign out of ftracker yet",
+			icon: "/favicon.ico",
+			actions: [{
+				action: "depart",
+				title: "Sign Out"
+			}]
+		})
+	})
+
+}
+
+function initPush(name) {
+
+	// Check availability
+	var supported = "serviceWorker" in navigator && "PushManager" in window
+	if (!supported) {
+		console.warn("Push Notifications not supported!")
+		return
+	}
+
+	// Register service worker
+	navigator.serviceWorker.register("/sw.js").then(function(swRegistration) {
+		console.log("ServiceWorker registered:", swRegistration)
+	})
+
+	// Request permission
+	// TODO: Only do this AFTER the first? SUCCESSFUL sign-in
+	Notification.requestPermission(function(result) {
+		return (result === 'granted')
+	}).then(function(consent) {
+		console.log('Notifications', consent ? 'enabled' : 'denied');
+	})
+
+	// Check if already initialized
+	if (localStorage.getItem('pushsub'))
+		return
+
+	// Register push service
+	navigator.serviceWorker.ready.then(function(serviceWorker) {
+		serviceWorker.pushManager.subscribe({
+			userVisibleOnly: true,
+			applicationServerKey: pushServerPublicKey
+		}).then(function(subscription) {
+			console.log("User is subscribed:", subscription);
+			localStorage.setItem('pushsub', subscription);
+
+			fetch('/pushsubscribe', {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({
+					name: name,
+					sub: subscription
+				})
+			});
+		});
+	});
 
 }

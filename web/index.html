@@ -13,25 +13,27 @@
 				'departure': 'I have cleaned my workspace'
 			}
 			var testCheckBox = '<label class="checkbox"><input type="checkbox" name="tested" id="tested"><span>I have been tested negative for COVID in the last 24 hours</span></label>'
+			var editTimeBox = '<label>Departure Date/Time:<input type="datetime-local" name="datetime" id="datetime" required></label>'
 			function getParams() {
-				var h = document.location.href
-				var qparam = h.split('?')[1] || null
-				if (qparam == null)
-					return null
-				var vals = qparam.split('=')
-				if (vals.length < 2 || !cbt.hasOwnProperty(vals[0]))
-					return null
-				return {
-					action: vals[0],
-					room: vals[1]
+				var qparams = document.location.search.substr(1)
+				if (qparams == "") return {}
+				qparams = qparams.split('&')
+				var qps = {}
+				for (var qparam of qparams) {
+					var vals = qparam.split('=')
+					qps[vals[0]] = vals[1] || null
 				}
+				// Backwards compat
+				if (qps.arrival)   {qps.action = 'arrival';   qps.room = qps.arrival}
+				if (qps.departure) {qps.action = 'departure'; qps.room = qps.departure}
+				return qps
 			}
 			var qp = getParams()
 		</script>
 	</head>
 	<body>
 		<h1><script>
-			document.write(qp ? (qp.action + "<br>Room " + qp.room) : 'FTracker<br>V1')
+			document.write(qp.action ? (qp.action + "<br>Room " + qp.room) : 'FTracker<br>V1')
 		</script></h1>
 		<div id="startpage">
 			This is a web app to track which people
@@ -56,6 +58,10 @@
 				Full Name:<br>
 				<input type="text" name="name" id="name" placeholder="John Doe" required>
 			</label>
+			<script>
+				if (qp.edittime && qp.edittime == 1)
+					document.write(editTimeBox)
+			</script>
 			<label class="checkbox">
 				<input type="checkbox" name="agree" id="agree" required>
 				<span><script>
@@ -63,7 +69,7 @@
 				</script></span>
 			</label>
 			<script>
-				if (qp && qp.action == 'arrival')
+				if (qp.action && qp.action == 'arrival')
 					document.write(testCheckBox)
 			</script>
 			<input type="submit">

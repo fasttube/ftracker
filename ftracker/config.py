@@ -9,10 +9,10 @@ class Config:
 		def findConfigFile():
 			if len(sys.argv) > 1:
 				return sys.argv[1]
-			elif Path('config.ini').is_file():
-				return 'config.ini'
 			elif Path('/etc/ftracker/config.ini').is_file():
 				return '/etc/ftracker/config.ini'
+			elif Path('config.ini').is_file():
+				return 'config.ini'
 			else:
 				return None
 

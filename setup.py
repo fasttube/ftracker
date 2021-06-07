@@ -20,6 +20,7 @@ st.setup(
 		"flask",
 		"tinydb",
 		"python-slugify",
+		"pywebpush",
 	],
 	license=license_text,
 	classifiers=[

@@ -22,6 +22,10 @@ from flask import Flask, request, redirect
 app = Flask(__name__, static_folder='../web')
 
 
+from pywebpush import webpush, WebPushException
+pushsubs = db.table('pushsubs')
+
+
 if config['delete_after_days']:
 	from .deleter import Deleter
 	deleter = Deleter(db, int(config['delete_after_days']))
@@ -159,3 +163,55 @@ def get_data():
 	)
 
 	return json.dumps(r, indent=SPACES), 200
+
+
+@app.route('/pushsubscribe', methods=['POST'])
+def post_pushsub():
+
+	try:
+		payload = request.data.decode('UTF-8')
+		data = json.loads(payload)
+	except ValueError as e:
+		return 'Error: JSON decode error:\n' + str(e), 400
+
+	name = slugify(data['name'])
+	data['name'] = name
+	print(json.dumps(data, indent=SPACES))
+
+	Entry = Query()
+	pushsubs.upsert(data, Entry.name == name)
+
+	return 'OK', 201
+
+@app.route('/testpush/<name>')
+def testpush(name):
+
+	Entry = Query()
+	ps = pushsubs.search(Entry.name == name)[0]
+
+	arr = db.search((Entry.name == name) & (Entry.departure == None))
+	arr = arr if len(arr) else None
+
+	print(ps)
+
+	subscription = ps['sub']
+	notification = {
+		'title': "Forgot to sign out?",
+		'body': "You didn't sign out of ftracker yet",
+		'arr': arr
+	}
+
+	try:
+		webpush(
+			subscription,
+			json.dumps(notification, indent=SPACES),
+			vapid_private_key = config['push_private_key'],
+			vapid_claims = {
+				'sub': config['push_sender_info']
+			},
+			verbose=True
+		)
+		return 'OK', 201
+	except WebPushException as exc:
+		print(exc)
+		return 'Error', 500

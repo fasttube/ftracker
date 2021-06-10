@@ -180,12 +180,7 @@ def post_pushsub():
 	except ValueError as e:
 		return 'Error: JSON decode error:\n' + str(e), 400
 
-	name = slugify(data['name'])
-	data['name'] = name
-	print(json.dumps(data, indent=SPACES))
-
-	Entry = Query()
-	pushsubs.upsert(data, Entry.name == name)
+	notifier.subscribe_user(data)
 
 	return 'OK', 201
 
@@ -211,6 +206,6 @@ def testpush(name):
 	error = notifier.notify_user(arrivals[0])
 
 	if error:
-		return 'Error: ' + error, 201
+		return 'Error: ' + error, 404
 
 	return 'OK', 201

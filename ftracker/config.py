@@ -19,7 +19,7 @@ class Config:
 		configfile = findConfigFile()
 
 		if configfile:
-			self.config = ConfigParser()
+			self.config = ConfigParser(strict=False)
 			self.config.read(configfile)
 		else:
 			raise Exception("No config file found")

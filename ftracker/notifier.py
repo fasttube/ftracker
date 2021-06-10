@@ -1,4 +1,5 @@
 import json
+from slugify import slugify
 from threading import Thread, Event
 from datetime import datetime, timedelta
 
@@ -9,6 +10,16 @@ from pywebpush import webpush, WebPushException
 ONE_HOUR_IN_S = 60 * 60
 
 class Notifier(Thread):
+
+	def subscribe_user(self, data):
+
+		pushsubs = self.db.table('pushsubs')
+
+		name = slugify(data['name'])
+		data['name'] = name
+
+		Entry = Query()
+		pushsubs.upsert(data, Entry.name == name)
 
 	def notify_user(self, arrival):
 

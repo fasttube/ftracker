@@ -250,7 +250,6 @@ function initPush(name) {
 			applicationServerKey: pushServerPublicKey
 		}).then(function(subscription) {
 			console.log("User is subscribed:", subscription);
-			localStorage.setItem('pushsub', subscription);
 
 			fetch('/pushsubscribe', {
 				method: "POST",
@@ -259,6 +258,9 @@ function initPush(name) {
 					name: name,
 					sub: subscription
 				})
+			}).then(function(res) {
+				if (res.ok)
+					localStorage.setItem('pushsub', subscription);
 			});
 		});
 	});

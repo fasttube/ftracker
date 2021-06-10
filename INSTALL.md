@@ -161,3 +161,40 @@ jänE   doé
 ```
 
 would still work, but `Jane D` wouldn't).
+
+### Automatic data deletion (GDPR compliance)
+
+The `delete_after_days` configuration option can be set to a number of days
+after which attendance records are purged from the database. If it is not set
+(or empty) automatic deletion is deactivated. Automatic deletion is final and
+non-recoverable. This option is intended to help make the system fully GDPR
+compliant by guaranteeing deletion after a certain period. Keep in mind that a
+legally binding data protection guideline and user consent are still required.
+
+### User notification on forgotten sign-out
+
+`ftracker` is capable of notifying users if they forgot to sign-out at the end
+of a day using modern web push notifications using the VAPID system. To make
+this work, a few things are needed:
+
+Firstly, you need an EC-Prime256v1 keypair in base64url encoding. If you're
+using the Docker container, this is automatically generated for you. If not,
+the easiest way to create one is to install the `web-push` `npm` package and
+run it:
+
+```bash
+sudo npm install -g web-push
+web-push generate-vapid-keys
+```
+
+The public Key needs to be copied into `web/main.js` (first line), while the
+private key is put into the config option `push_private_key`.
+
+Then, to be VAPID compliant you have to announce an contact address claim to
+the push services so they can contact you if anything is going wrong with your
+notifications. Do this by entering your email address as a `mailto:` link in
+the `push_sender_info` option, like `mailto:it@fasttube.de`.
+
+Finally, you can use the `notify_after_hrs` option to specify how long the
+system should wait after a user's arrival to notify them of their missing
+departure.

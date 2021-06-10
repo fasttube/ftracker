@@ -1,7 +1,9 @@
 FROM alpine:latest
 
 RUN apk add --update --no-cache \
-	bash python3 py3-pip nginx uwsgi uwsgi-python3 certbot certbot-nginx
+	bash python3 py3-pip nginx uwsgi uwsgi-python3 certbot certbot-nginx npm jq
+
+RUN npm install -g web-push
 
 
 

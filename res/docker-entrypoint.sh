@@ -1,5 +1,25 @@
 #!/bin/bash
 
+echo " >>> Checking / Creating & patching VAPID creds <<< "
+
+VAPID_CREDS_FILE=/etc/ftracker/vapid-creds.json
+if [[ ! -f $VAPID_CREDS_FILE ]]
+then
+
+	echo "Generating keypair ..."
+
+	web-push generate-vapid-keys --json > $VAPID_CREDS_FILE
+
+	echo "Patching public key into frontend ..."
+	PUB_KEY=`cat $VAPID_CREDS_FILE | jq -r .publicKey`
+	sed -i "s/pushServerPublicKey = '[a-zA-Z0-9_\-]*'/pushServerPublicKey = '${PUB_KEY}'/" /var/www/html/ftracker/main.js
+
+	echo "Patching private key into backend config ..."
+	PRIV_KEY=`cat $VAPID_CREDS_FILE | jq -r .privateKey`
+	echo "push_private_key = ${PRIV_KEY}" >> /etc/ftracker/config.ini
+
+fi
+
 echo " >>> Starting nginx <<< "
 
 mkdir /run/nginx # needed because of bug in package

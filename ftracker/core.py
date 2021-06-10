@@ -171,6 +171,25 @@ def get_data():
 	return json.dumps(r, indent=SPACES), 200
 
 
+@app.route('/pushinfo')
+def get_pushinfo():
+
+	if config['notify_after_hrs']:
+
+		r = {
+			'enabled': True,
+			'publickey': config['push_public_key']
+		}
+
+	else:
+
+		r = {
+			'enabled': False,
+			'publickey': None
+		}
+
+	return json.dumps(r, indent=SPACES), 200
+
 @app.route('/pushsubscribe', methods=['POST'])
 def post_pushsub():
 

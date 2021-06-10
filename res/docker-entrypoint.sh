@@ -10,11 +10,10 @@ then
 
 	web-push generate-vapid-keys --json > $VAPID_CREDS_FILE
 
-	echo "Patching public key into frontend ..."
+	echo "Patching keypair into config ..."
 	PUB_KEY=`cat $VAPID_CREDS_FILE | jq -r .publicKey`
-	sed -i "s/pushServerPublicKey = '[a-zA-Z0-9_\-]*'/pushServerPublicKey = '${PUB_KEY}'/" /var/www/html/ftracker/main.js
+	echo "pushServerPublicKey = ${PUB_KEY}" >> /var/www/html/ftracker/main.js
 
-	echo "Patching private key into backend config ..."
 	PRIV_KEY=`cat $VAPID_CREDS_FILE | jq -r .privateKey`
 	echo "push_private_key = ${PRIV_KEY}" >> /etc/ftracker/config.ini
 

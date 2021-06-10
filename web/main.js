@@ -1,5 +1,3 @@
-var pushServerPublicKey = 'BBwBPYxhogHLU3B1FpxfQNzO3q7qZpmD1n1KaaL8WJbcVmJSHhi1uB-VmvsVjjUHWYCeqKyLT7w-1LBfpIcbbcg'
-
 var spage = document.getElementById('startpage')
 var mform = document.getElementById('mainform')
 
@@ -225,6 +223,18 @@ function initPush(name) {
 		console.warn("Push Notifications not supported!")
 		return
 	}
+
+	fetch('/pushinfo').then(function(res) {
+		if (res.ok)
+			res.json().then(function(push) {
+				if (push.enabled)
+					registerPush(name, push.publickey);
+			});
+	});
+
+}
+
+function registerPush(name, pushServerPublicKey) {
 
 	// Register service worker
 	navigator.serviceWorker.register("/sw.js").then(function(swRegistration) {

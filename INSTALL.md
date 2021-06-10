@@ -187,10 +187,10 @@ sudo npm install -g web-push
 web-push generate-vapid-keys
 ```
 
-The public Key needs to be copied into `web/main.js` (first line), while the
-private key is put into the config option `push_private_key`.
+The keys then need to be copied into the config options `push_public_key` and
+`push_private_key` respectively so the backend can handle the rest.
 
-Then, to be VAPID compliant you have to announce an contact address claim to
+Next, to be VAPID compliant you have to announce an contact address claim to
 the push services so they can contact you if anything is going wrong with your
 notifications. Do this by entering your email address as a `mailto:` link in
 the `push_sender_info` option, like `mailto:it@fasttube.de`.

@@ -30,3 +30,6 @@ class Config:
 
 	def __getitem__(self, key):
 		return self.config['global'].get(key)
+
+	def __repr__(self):
+		return repr(self.config.items('global'))

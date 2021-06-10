@@ -22,13 +22,18 @@ from flask import Flask, request, redirect
 app = Flask(__name__, static_folder='../web')
 
 
-from pywebpush import webpush, WebPushException
-pushsubs = db.table('pushsubs')
-
-
 if config['delete_after_days']:
 	from .deleter import Deleter
 	deleter = Deleter(db, int(config['delete_after_days']))
+
+
+if config['notify_after_hrs']:
+	from .notifier import Notifier
+	notifier = Notifier(db, int(config['notify_after_hrs']), {
+		'private_key': config['push_private_key'],
+		'claims': {'sub': config['push_sender_info']}
+	})
+
 
 def shutdown():
 	print('\rReceived stop signal, stopping threads...')
@@ -36,6 +41,7 @@ def shutdown():
 	db.close()
 
 atexit.register(shutdown)
+
 
 @app.route('/guidelines')
 def get_guidelines():
@@ -186,32 +192,25 @@ def post_pushsub():
 @app.route('/testpush/<name>')
 def testpush(name):
 
+	if not 'Authorization' in request.headers:
+		return 'Error: No Authorization', 401, {'WWW-Authenticate': 'Basic'}
+
+	if request.authorization.username != config['admin_user']:
+		return "Wrong username", 403
+
+	if request.authorization.password != config['admin_pass']:
+		return "Wrong password", 403
+
 	Entry = Query()
-	ps = pushsubs.search(Entry.name == name)[0]
+	arrivals = db.search((Entry.name == name) & (Entry.departure == None))
 
-	arr = db.search((Entry.name == name) & (Entry.departure == None))
-	arr = arr if len(arr) else None
+	if len(arrivals) == 0:
+		print("User is not logged in :(")
+		return "Error: User is not logged in :(", 409
 
-	print(ps)
+	error = notifier.notify_user(arrivals[0])
 
-	subscription = ps['sub']
-	notification = {
-		'title': "Forgot to sign out?",
-		'body': "You didn't sign out of ftracker yet",
-		'arr': arr
-	}
+	if error:
+		return 'Error: ' + error, 201
 
-	try:
-		webpush(
-			subscription,
-			json.dumps(notification, indent=SPACES),
-			vapid_private_key = config['push_private_key'],
-			vapid_claims = {
-				'sub': config['push_sender_info']
-			},
-			verbose=True
-		)
-		return 'OK', 201
-	except WebPushException as exc:
-		print(exc)
-		return 'Error', 500
+	return 'OK', 201

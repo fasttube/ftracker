@@ -8,7 +8,7 @@ with open("LICENSE.md", "r") as f:
 
 st.setup(
 	name="ftracker",
-	version="1.0.0",
+	version="1.1.0",
 	author="Oskar @ FaSTTUBe",
 	author_email="o.winkels@fasttube.de",
 	description="Small webapp to track who was in which room at which time to backtrace potential viral infections",

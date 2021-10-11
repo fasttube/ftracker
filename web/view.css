@@ -70,6 +70,9 @@ main > section.times, #timeheader {
 .times span.implausible {
 	background: linear-gradient(to right, #c50e1f, rgba(197,14,31,0.2) 1000px);
 }
+.times span.implausible.tested {
+	background: linear-gradient(to right, rgb(0,136,0), rgba(0,136,0,0.2) 1000px);
+}
 .viewheader.row {
 	height: 30px;
 	background: #ddd !important;

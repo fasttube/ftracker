@@ -163,7 +163,7 @@ function renderData() {
 			block.style.left  = arr + 'px' // 1px/min
 			block.style.width = Math.max(0,(dur-14)) + 'px' // 1px/min
 			if (entry.tested)
-				block.classList.add('tested')
+				block.classList.add('tested') // = 3G
 
 			if (dur > 60 * 24)
 				block.classList.add('implausible')

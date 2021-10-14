@@ -43,7 +43,7 @@ function sendMainData() {
 			'name': name,
 			'arrival': datetime,
 			'agreetoguidelines': agreed,
-			'tested': tested
+			'tested': tested // = 3G
 		} :
 		{
 			'name': name,
@@ -104,7 +104,7 @@ function handleRequestSubmit(e, json) {
 	var iso = new Date(input).toISOString()
 
 	if (e.srcElement.length > 1)
-		tested = e.srcElement[1].checked
+		tested = e.srcElement[1].checked // = 3G
 
 	// POST JSON. See docs/API.md
 	var payload = (json.request == 'arrival') ?
@@ -113,7 +113,7 @@ function handleRequestSubmit(e, json) {
 			'name': name,
 			'arrival': iso,
 			'agreetoguidelines': agreed,
-			'tested': tested
+			'tested': tested // = 3G
 		} :
 		{
 			'name': name,

@@ -67,6 +67,9 @@ main > section.times, #timeheader {
 	font-weight: bold;
 	-webkit-text-stroke: .4px #c50e1f;
 }
+.times span.tested {  /* = 3G */
+	background: rgb(0,136,0);
+}
 .times span.implausible {
 	background: linear-gradient(to right, #c50e1f, rgba(197,14,31,0.2) 1000px);
 }

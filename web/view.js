@@ -88,6 +88,14 @@ function exportCSV() {
 
 }
 
+function offerUserCheckout(event) {
+
+	var name = event.target.getAttribute('data-name')
+	var room = event.target.textContent
+	window.open(`/?departure=${room}&edittime=1&name=${name}`, '_blank').focus();
+
+}
+
 function renderData() {
 
 	if (data == null) {
@@ -165,8 +173,11 @@ function renderData() {
 			if (entry.tested)
 				block.classList.add('tested') // = 3G
 
-			if (dur > 60 * 24)
+			if (dur > 60 * 24) {
 				block.classList.add('implausible')
+				block.setAttribute('data-name', name)
+				block.addEventListener('click', offerUserCheckout);
+			}
 
 			row.appendChild(block)
 

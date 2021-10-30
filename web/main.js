@@ -6,10 +6,17 @@ if (qp.action) {
 	mform.style.display = 'block'
 }
 
-// Prefill the name field if it was successfully entered before
+// Get the name field if it was successfully entered before
 var savedName = localStorage.getItem('name')
-if (savedName && qp)
+if (qp && qp.name) {
+	// Forced Admin checkout - prefill qp name and auto-agree
+	document.getElementById('name').value = qp.name.replace(/-/g, ' ').toUpperCase();
+	document.getElementById('agree').checked = true
+	document.getElementById('agree').parentElement.style.display = 'none'
+} else if (savedName && qp) {
+	// Prefill the client's locally saved name
 	document.getElementById('name').value = savedName
+}
 
 // 2nd script, server API communication
 var name, datetime, agreed, tested

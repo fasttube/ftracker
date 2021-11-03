@@ -1,4 +1,5 @@
 import json
+import copy
 from slugify import slugify
 from threading import Thread, Event
 from datetime import datetime, timedelta
@@ -33,7 +34,7 @@ class Notifier(Thread):
 
 		ps = ps[0]
 
-		print("Sending notification", arrival, ps)
+		print("Sending notification", arrival, ps, self.vapid_creds)
 
 		subscription = ps['sub']
 		notification = {
@@ -41,13 +42,15 @@ class Notifier(Thread):
 			'body': "You didn't sign out of ftracker yet",
 			'arr': arrival
 		}
+		privkey = self.vapid_creds['private_key']
+		claims = copy.copy(self.vapid_creds['claims'])
 
 		try:
 			webpush(
 				subscription,
 				json.dumps(notification),
-				vapid_private_key = self.vapid_creds['private_key'],
-				vapid_claims = self.vapid_creds['claims']
+				vapid_private_key = privkey,
+				vapid_claims = claims
 			)
 			print("Notification sent")
 			return None

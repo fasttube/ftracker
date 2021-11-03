@@ -268,16 +268,18 @@ function registerPush(name, pushServerPublicKey) {
 		}).then(function(subscription) {
 			console.log("User is subscribed:", subscription);
 
+			var jsonSub = JSON.stringify({
+				name: name,
+				sub: subscription
+			});
+
 			fetch('/pushsubscribe', {
 				method: "POST",
 				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({
-					name: name,
-					sub: subscription
-				})
+				body: jsonSub
 			}).then(function(res) {
 				if (res.ok)
-					localStorage.setItem('pushsub', subscription);
+					localStorage.setItem('pushsub', jsonSub);
 			});
 		});
 	});
